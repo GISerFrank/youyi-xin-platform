@@ -1,105 +1,299 @@
 <template>
-  <div class="bubbles-veil" @click="dismiss"></div>
-
-  <div class="bubbles-container">
-    <div
-        v-for="bubble in bubbles"
-        :key="bubble.id"
-        class="bubble"
-        :style="{ top: bubble.top, left: bubble.left, width: bubble.size + 'px', height: bubble.size + 'px' }"
-        @click="selectBubble(bubble)"
-    >
-      <img :src="bubble.icon" :alt="bubble.category" />
-      <span>{{ bubble.category }}</span>
+  <Teleport to="body">
+    <!-- 背景遮罩 -->
+    <div class="bubbles-backdrop" @click="dismiss">
+      <div class="backdrop-pattern"></div>
     </div>
-  </div>
+    
+    <!-- 泡泡容器 -->
+    <div class="bubbles-container">
+      <div class="bubbles-title">
+        <span class="title-icon">✨</span>
+        <span>今天想探索什么？</span>
+      </div>
+      
+      <div class="bubbles-grid">
+        <button
+          v-for="(bubble, index) in bubbles"
+          :key="bubble.id"
+          class="bubble"
+          :class="bubble.className"
+          :style="{ animationDelay: `${index * 0.1}s` }"
+          @click="selectBubble(bubble)"
+        >
+          <span class="bubble-icon">{{ bubble.icon }}</span>
+          <span class="bubble-label">{{ bubble.category }}</span>
+          <span class="bubble-hint">{{ bubble.hint }}</span>
+        </button>
+      </div>
+      
+      <button class="close-btn" @click="dismiss">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+  </Teleport>
 </template>
 
 <script setup>
 import { ref } from 'vue';
 
-// 核心修改：定义组件会触发的事件
 const emit = defineEmits(['select-category', 'dismiss']);
 
-// 核心修改：定义选择和关闭的方法
 const selectBubble = (bubble) => {
-  emit('select-category', bubble.category); // 发送选择的分类
-  dismiss(); // 选择后也关闭泡泡
+  emit('select-category', bubble.category);
+  dismiss();
 };
 
 const dismiss = () => {
-  emit('dismiss'); // 发送关闭信号
+  emit('dismiss');
 };
 
-// 定义泡泡的数据：类别、图标路径、初始位置和大小
 const bubbles = ref([
-  { id: 1, category: '书店与咖啡', icon: '/images/bubble-cafe.png', top: '25%', left: '55%', size: 120 },
-  { id: 2, category: '特色餐饮', icon: '/images/bubble-food.png', top: '50%', left: '20%', size: 150 },
-  { id: 3, category: '手工艺', icon: '/images/bubble-craft.png', top: '65%', left: '65%', size: 100 },
-  { id: 4, category: '民宿', icon: '/images/bubble-hotel.png', top: '20%', left: '15%', size: 110 },
-  // 你可以根据需要添加更多泡泡
+  { 
+    id: 1, 
+    category: '书店与咖啡', 
+    icon: '☕', 
+    hint: '慢时光',
+    className: 'cafe'
+  },
+  { 
+    id: 2, 
+    category: '特色餐饮', 
+    icon: '🍜', 
+    hint: '本地味道',
+    className: 'food'
+  },
+  { 
+    id: 3, 
+    category: '手工艺', 
+    icon: '🎨', 
+    hint: '匠心独运',
+    className: 'craft'
+  },
+  { 
+    id: 4, 
+    category: '民宿', 
+    icon: '🏠', 
+    hint: '栖居之所',
+    className: 'hotel'
+  },
 ]);
 </script>
 
 <style scoped>
-/* 核心修改：增加幕布的样式 */
-.bubbles-veil {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.2);
-  z-index: 9;
-  cursor: pointer;
+/* 背景遮罩 */
+.bubbles-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(74, 69, 65, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
 }
 
+.backdrop-pattern {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(
+    circle at 20% 30%,
+    rgba(198, 123, 92, 0.1) 0%,
+    transparent 50%
+  ),
+  radial-gradient(
+    circle at 80% 70%,
+    rgba(156, 175, 136, 0.1) 0%,
+    transparent 50%
+  );
+}
+
+/* 泡泡容器 */
 .bubbles-container {
-  /* 容器本身铺满父元素，且不阻挡鼠标事件穿透到地图 */
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 10; /* 确保在地图图层之上 */
-}
-
-.bubble {
-  /* 泡泡本身可以接收鼠标事件 */
-  pointer-events: auto;
-
-  position: absolute;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1001;
+  
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
+  padding: 40px;
+  
+  background: var(--glass-bg-strong);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+  
+  animation: scaleIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
 
-  background-color: rgba(255, 255, 255, 0.85);
-  border-radius: 50%;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+.bubbles-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 32px;
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--color-text);
+}
 
+.title-icon {
+  font-size: 24px;
+}
+
+.bubbles-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+/* 单个泡泡 */
+.bubble {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 140px;
+  height: 140px;
+  padding: 20px;
+  
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--warm-cream);
+  
   cursor: pointer;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-
-  /* 防止文字被选中 */
-  user-select: none;
+  transition: all var(--transition-normal);
+  animation: bubbleIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
 }
 
 .bubble:hover {
-  transform: scale(1.1);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: var(--shadow-lg);
 }
 
-.bubble img {
-  width: 45%;
-  height: 45%;
-  margin-bottom: 5px;
+.bubble.cafe {
+  border-color: rgba(198, 123, 92, 0.3);
+}
+.bubble.cafe:hover {
+  background: rgba(198, 123, 92, 0.08);
+  border-color: var(--terracotta);
 }
 
-.bubble span {
+.bubble.food {
+  border-color: rgba(232, 165, 152, 0.3);
+}
+.bubble.food:hover {
+  background: rgba(232, 165, 152, 0.1);
+  border-color: var(--soft-coral);
+}
+
+.bubble.craft {
+  border-color: rgba(156, 175, 136, 0.3);
+}
+.bubble.craft:hover {
+  background: rgba(156, 175, 136, 0.1);
+  border-color: var(--sage-green);
+}
+
+.bubble.hotel {
+  border-color: rgba(139, 164, 180, 0.3);
+}
+.bubble.hotel:hover {
+  background: rgba(139, 164, 180, 0.1);
+  border-color: var(--dusty-blue);
+}
+
+.bubble-icon {
+  font-size: 36px;
+  margin-bottom: 10px;
+}
+
+.bubble-label {
   font-size: 14px;
-  color: #333;
-  font-weight: 500;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 4px;
+}
+
+.bubble-hint {
+  font-size: 12px;
+  color: var(--color-text-mute);
+}
+
+/* 关闭按钮 */
+.close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: var(--radius-full);
+  background: var(--warm-cream-mute);
+  color: var(--color-text-soft);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.close-btn:hover {
+  background: var(--terracotta);
+  color: white;
+}
+
+/* 动画 */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { 
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+  to { 
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes bubbleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* 响应式 */
+@media (max-width: 480px) {
+  .bubbles-container {
+    padding: 30px 20px;
+    margin: 20px;
+    width: calc(100% - 40px);
+  }
+  
+  .bubbles-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  
+  .bubble {
+    width: 120px;
+    height: 120px;
+  }
 }
 </style>

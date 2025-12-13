@@ -5,7 +5,10 @@ import App from './App.vue'
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 
+// 引入自定义样式
+import '@/assets/main.css'
+
 const app = createApp(App)
 
-app.use(ElementPlus) // 全局注册 Element Plus
+app.use(ElementPlus)
 app.mount('#app')

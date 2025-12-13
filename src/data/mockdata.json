@@ -7,7 +7,7 @@
     "latitude": 25.6932,
     "address": "大理古城人民路下段123号",
     "description": "一家充满文艺气息的独立书店，提供手冲咖啡和安静的阅读角落。",
-    "photos": ["https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=2487"],
+    "photos": ["https://images.unsplash.com/photo-1521587760476-6c12a4b040da?w=400&q=80"],
     "opening_hours": "10:00 - 22:00"
   },
   {
@@ -18,7 +18,7 @@
     "latitude": 25.6958,
     "address": "大理古城叶榆路98号",
     "description": "主打本地白族特色融合菜，庭院环境优美，需要提前预定。",
-    "photos": ["https://images.unsplash.com/photo-1552566626-52f8b828add9?q=80&w=2670"],
+    "photos": ["https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&q=80"],
     "opening_hours": "11:30 - 21:00"
   },
   {
@@ -29,7 +29,7 @@
     "latitude": 25.6915,
     "address": "大理古城洋人街南侧",
     "description": "可以亲手体验传统白族蓝染工艺，制作属于自己的手帕或帆布袋。",
-    "photos": ["https://images.unsplash.com/photo-1596733221381-13735b5a2b16?q=80&w=2574"],
+    "photos": ["https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80"],
     "opening_hours": "09:30 - 18:00"
   },
   {
@@ -40,7 +40,7 @@
     "latitude": 25.8625,
     "address": "大理市双廊镇，近洱海",
     "description": "拥有无敌海景的设计师民宿，每个房间都有独特的风格和故事。",
-    "photos": ["https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=2670"],
+    "photos": ["https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&q=80"],
     "opening_hours": "全天"
   }
 ]

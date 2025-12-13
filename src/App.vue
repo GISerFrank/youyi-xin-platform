@@ -1,94 +1,149 @@
 <template>
-  <div class="common-layout">
-    <el-container>
-      <el-header class="header">
-        <div class="header-content">
-          <h1>❤️ 心商家地图</h1>
-          <div class="map-controls">
-            <el-button-group>
-              <el-button
-                  v-for="category in categories"
-                  :key="category"
-                  :type="selectedCategory === category ? 'primary' : 'default'"
-                  size="small"
-                  @click="handleCategorySelect(category)"
-              >
-                {{ getCategoryIcon(category) }} {{ category }}
-              </el-button>
-            </el-button-group>
-            <el-divider direction="vertical" />
-            <el-button type="success" size="small" @click="resetFilters" :icon="View">显示全部</el-button>
-            <el-button size="small" @click="fitView" :icon="FullScreen">适应视图</el-button>
-            <el-divider direction="vertical" />
-            <el-tag type="info" class="marker-count">显示: {{ filteredMerchants.length }} / 总计: {{ merchants.length }}</el-tag>
+  <div class="app-container">
+    <!-- 顶部导航 - 玻璃拟态效果 -->
+    <header class="app-header">
+      <div class="header-left">
+        <div class="logo">
+          <span class="logo-icon">❤️</span>
+          <h1 class="logo-text">心地图</h1>
+          <span class="logo-subtitle">· 大理</span>
+        </div>
+      </div>
+      
+      <nav class="header-nav">
+        <div class="category-pills">
+          <button
+            v-for="category in categories"
+            :key="category"
+            :class="['pill', { active: selectedCategory === category }]"
+            @click="handleCategorySelect(category)"
+          >
+            <span class="pill-icon">{{ getCategoryIcon(category) }}</span>
+            <span class="pill-text">{{ category }}</span>
+          </button>
+        </div>
+        
+        <div class="nav-divider"></div>
+        
+        <div class="nav-actions">
+          <button class="action-btn" @click="resetFilters">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+            <span>显示全部</span>
+          </button>
+          <button class="action-btn" @click="fitView">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>
+            </svg>
+            <span>适应视图</span>
+          </button>
+        </div>
+        
+        <div class="stats-badge">
+          <span class="stats-current">{{ filteredMerchants.length }}</span>
+          <span class="stats-divider">/</span>
+          <span class="stats-total">{{ merchants.length }}</span>
+        </div>
+      </nav>
+    </header>
+
+    <!-- 主体内容 -->
+    <main class="app-main">
+      <!-- 侧边栏 - 玻璃拟态 -->
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <div class="search-box">
+            <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/>
+              <path d="m21 21-4.35-4.35"/>
+            </svg>
+            <input 
+              v-model="searchText" 
+              type="text" 
+              placeholder="搜索商家名称..." 
+              class="search-input"
+            />
+            <button v-if="searchText" class="search-clear" @click="searchText = ''">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+          </div>
+          
+          <div class="category-stats">
+            <span 
+              v-for="(count, category) in categoryStats" 
+              :key="category"
+              :class="['stat-tag', getCategoryClass(category)]"
+            >
+              {{ getCategoryIcon(category) }} {{ category }} · {{ count }}
+            </span>
           </div>
         </div>
-      </el-header>
-
-      <el-container>
-        <el-aside width="350px" class="aside">
-          <div class="search-box">
-            <el-input v-model="searchText" placeholder="搜索商家名称..." :prefix-icon="Search" clearable />
-          </div>
-
-          <div class="category-stats">
-            <el-space wrap>
-              <el-tag
-                  v-for="(count, category) in categoryStats"
-                  :key="category"
-                  :type="getCategoryTagType(category)"
-                  size="small"
-              >
-                {{ category }}: {{ count }}
-              </el-tag>
-            </el-space>
-          </div>
-
-          <MerchantList
-              :merchants="filteredMerchants"
-              @item-click="handleMerchantSelect"
+        
+        <div class="merchant-list">
+          <MerchantCard
+            v-for="merchant in filteredMerchants"
+            :key="merchant.id"
+            :merchant="merchant"
+            @click="handleMerchantSelect(merchant)"
           />
-        </el-aside>
-
-        <el-main class="main-content">
-          <MapView
-              ref="mapViewRef"
-              :merchants="filteredMerchants"
-              @marker-click="handleMerchantSelect"
-          />
-          <EntryPoint v-if="!showBubbles" @activate="handleActivateBubbles" />
-          <InspirationBubbles
-              v-if="showBubbles"
-              @dismiss="handleDismissBubbles"
-              @select-category="handleCategorySelect"
-          />
-
-          <div class="floating-actions">
-            <el-tooltip content="回到初始视图" placement="left">
-              <el-button
-                  circle
-                  :icon="HomeFilled"
-                  @click="resetView"
-                  type="primary"
-              />
-            </el-tooltip>
+          
+          <div v-if="filteredMerchants.length === 0" class="empty-state">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M8 15s1.5 2 4 2 4-2 4-2"/>
+              <line x1="9" y1="9" x2="9.01" y2="9"/>
+              <line x1="15" y1="9" x2="15.01" y2="9"/>
+            </svg>
+            <p>暂无符合条件的商家</p>
           </div>
-        </el-main>
-      </el-container>
-    </el-container>
+        </div>
+      </aside>
+
+      <!-- 地图区域 -->
+      <section class="map-section">
+        <MapView
+          ref="mapViewRef"
+          :merchants="filteredMerchants"
+          @marker-click="handleMerchantSelect"
+        />
+        
+        <!-- 灵感入口 -->
+        <InspirationEntry v-if="!showBubbles" @activate="handleActivateBubbles" />
+        
+        <!-- 灵感泡泡 -->
+        <InspirationBubbles
+          v-if="showBubbles"
+          @dismiss="handleDismissBubbles"
+          @select-category="handleCategorySelect"
+        />
+        
+        <!-- 浮动操作按钮 -->
+        <div class="floating-actions">
+          <button class="fab" @click="resetView" title="回到初始视图">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+              <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+          </button>
+        </div>
+      </section>
+    </main>
   </div>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue';
-// --- 恢复：引入 HomeFilled 图标 ---
-import { View, FullScreen, Search, HomeFilled } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus';
 import allMerchants from '@/data/mockdata.json';
-import MerchantList from './components/MerchantList.vue';
-import MapView from './components/MapView.vue';
-import InspirationBubbles from './components/InspirationBubbles.vue';
-import EntryPoint from './components/InspirationEntry.vue';
+import MerchantCard from '@/components/MerchantCard.vue';
+import MapView from '@/components/MapView.vue';
+import InspirationBubbles from '@/components/InspirationBubbles.vue';
+import InspirationEntry from '@/components/InspirationEntry.vue';
 
 // 组件引用
 const mapViewRef = ref(null);
@@ -100,9 +155,8 @@ const selectedCategory = ref('全部');
 const showBubbles = ref(false);
 const categories = ['书店与咖啡', '特色餐饮', '手工艺', '民宿'];
 
-// 核心筛选逻辑 (计算属性)
+// 核心筛选逻辑
 const filteredMerchants = computed(() => {
-  // ... 筛选逻辑不变 ...
   return merchants.value.filter(merchant => {
     const categoryMatch = selectedCategory.value === '全部' || merchant.category === selectedCategory.value;
     const searchMatch = searchText.value === '' || merchant.name.toLowerCase().includes(searchText.value.toLowerCase());
@@ -110,7 +164,7 @@ const filteredMerchants = computed(() => {
   });
 });
 
-// --- 恢复：分类统计的计算属性 ---
+// 分类统计
 const categoryStats = computed(() => {
   const stats = {};
   merchants.value.forEach(merchant => {
@@ -126,83 +180,401 @@ const categoryStats = computed(() => {
 // 事件处理方法
 const handleActivateBubbles = () => { showBubbles.value = true; };
 const handleDismissBubbles = () => { showBubbles.value = false; };
+
 const handleCategorySelect = (category) => {
   selectedCategory.value = category;
   handleDismissBubbles();
-  fitView()
+  fitView();
 };
+
 const handleMerchantSelect = (merchant) => {
   if (mapViewRef.value) {
     mapViewRef.value.flyTo(merchant);
   }
 };
+
 const resetFilters = () => {
   selectedCategory.value = '全部';
   searchText.value = '';
-  ElMessage.success('已重置所有筛选');
+  ElMessage({
+    message: '已重置所有筛选',
+    type: 'success',
+    customClass: 'custom-message'
+  });
 };
+
 const fitView = () => {
   mapViewRef.value?.fitToAllMarkers();
 };
 
-// --- 恢复：回到初始视图的方法 ---
 const resetView = () => {
   if (mapViewRef.value) {
-    // 调用 flyTo 方法回到我们设定的初始点
     mapViewRef.value.flyTo({
       longitude: 100.163,
       latitude: 25.694
     });
-    ElMessage.success('已回到初始视图');
+    ElMessage({
+      message: '已回到初始视图',
+      type: 'success',
+      customClass: 'custom-message'
+    });
   }
 };
 
 // 辅助方法
 const getCategoryIcon = (category) => {
-  const icons = { '书店与咖啡': '☕', '特色餐饮': '🍜', '手工艺': '🎨', '民宿': '🏠' };
+  const icons = { 
+    '书店与咖啡': '☕', 
+    '特色餐饮': '🍜', 
+    '手工艺': '🎨', 
+    '民宿': '🏠' 
+  };
   return icons[category] || '📍';
 };
-// --- 恢复：分类标签类型的辅助方法 ---
-const getCategoryTagType = (category) => {
-  const types = { '书店与咖啡': 'warning', '特色餐饮': 'danger', '手工艺': 'success', '民宿': 'primary' };
-  return types[category] || 'info';
+
+const getCategoryClass = (category) => {
+  const classes = { 
+    '书店与咖啡': 'cafe', 
+    '特色餐饮': 'food', 
+    '手工艺': 'craft', 
+    '民宿': 'hotel' 
+  };
+  return classes[category] || '';
 };
 </script>
 
 <style>
-/* ... 全局样式不变 ... */
-/* 全局样式，修复el-header高度问题 */
-.header {
-  height: auto !important;
-  line-height: normal;
-  padding: 10px 20px;
-  border-bottom: 1px solid #e4e7ed;
-}
-.aside {
-  height: calc(100vh - 68px); /* 根据header实际高度微调 */
-  border-right: 1px solid #e4e7ed;
+/* 全局消息样式 */
+.custom-message {
+  background: var(--glass-bg-strong) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: var(--radius-md) !important;
+  backdrop-filter: blur(10px);
 }
 </style>
 
 <style scoped>
-/* ... scoped 样式不变，但为新加的元素补充样式 ... */
-.header-content { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
-.header h1 { margin: 0; font-size: 24px; }
-.map-controls { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.marker-count { margin-left: 5px; }
-.search-box { padding: 15px; border-bottom: 1px solid #e4e7ed; }
-.main-content { position: relative; padding: 0; height: calc(100vh - 68px); }
-.el-divider--vertical { height: 20px; }
-.category-stats {
-  padding: 10px 15px;
-  background: #fafafa;
-  border-bottom: 1px solid #e4e7ed;
+.app-container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--color-background);
 }
+
+/* ==================== 顶部导航 ==================== */
+.app-header {
+  height: 64px;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-sm);
+  z-index: 100;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.logo-icon {
+  font-size: 24px;
+  margin-right: 8px;
+}
+
+.logo-text {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--color-text);
+  letter-spacing: -0.5px;
+}
+
+.logo-subtitle {
+  font-family: var(--font-display);
+  font-size: 14px;
+  color: var(--color-text-soft);
+  font-weight: 400;
+}
+
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.category-pills {
+  display: flex;
+  gap: 6px;
+}
+
+.pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: var(--radius-full);
+  background: var(--warm-cream-mute);
+  border: 1px solid transparent;
+  color: var(--color-text-soft);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.pill:hover {
+  background: var(--warm-cream);
+  border-color: var(--color-border-hover);
+  color: var(--color-text);
+}
+
+.pill.active {
+  background: linear-gradient(135deg, var(--terracotta) 0%, var(--terracotta-dark) 100%);
+  color: white;
+  border-color: transparent;
+  box-shadow: 0 2px 8px rgba(198, 123, 92, 0.3);
+}
+
+.pill-icon {
+  font-size: 14px;
+}
+
+.nav-divider {
+  width: 1px;
+  height: 24px;
+  background: var(--color-border);
+}
+
+.nav-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-soft);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.action-btn:hover {
+  background: var(--warm-cream-mute);
+  border-color: var(--color-border-hover);
+  color: var(--color-text);
+}
+
+.action-btn svg {
+  opacity: 0.7;
+}
+
+.stats-badge {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 12px;
+  background: var(--terracotta-bg);
+  border-radius: var(--radius-full);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.stats-current {
+  color: var(--terracotta);
+}
+
+.stats-divider {
+  color: var(--color-text-mute);
+}
+
+.stats-total {
+  color: var(--color-text-soft);
+}
+
+/* ==================== 主体内容 ==================== */
+.app-main {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+/* ==================== 侧边栏 ==================== */
+.sidebar {
+  width: 380px;
+  display: flex;
+  flex-direction: column;
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-right: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-md);
+}
+
+.sidebar-header {
+  padding: 20px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 14px;
+  color: var(--color-text-mute);
+  pointer-events: none;
+}
+
+.search-input {
+  width: 100%;
+  padding: 12px 40px 12px 44px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--warm-cream);
+  font-size: 14px;
+  color: var(--color-text);
+  transition: all var(--transition-normal);
+}
+
+.search-input::placeholder {
+  color: var(--color-text-mute);
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--terracotta);
+  box-shadow: 0 0 0 3px rgba(198, 123, 92, 0.1);
+}
+
+.search-clear {
+  position: absolute;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-full);
+  background: var(--color-text-mute);
+  color: white;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.search-clear:hover {
+  background: var(--color-text-soft);
+}
+
+.category-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.stat-tag {
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 500;
+  background: var(--warm-cream-mute);
+  color: var(--color-text-soft);
+}
+
+.stat-tag.cafe { background: rgba(198, 123, 92, 0.12); color: var(--terracotta); }
+.stat-tag.food { background: rgba(232, 165, 152, 0.15); color: #c45d4d; }
+.stat-tag.craft { background: rgba(156, 175, 136, 0.15); color: #6b8f5c; }
+.stat-tag.hotel { background: rgba(139, 164, 180, 0.15); color: #5a7d8f; }
+
+.merchant-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  color: var(--color-text-mute);
+  text-align: center;
+}
+
+.empty-state svg {
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.empty-state p {
+  font-size: 14px;
+}
+
+/* ==================== 地图区域 ==================== */
+.map-section {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ==================== 浮动按钮 ==================== */
 .floating-actions {
   position: absolute;
-  bottom: 30px;
-  right: 30px;
-  /* 注意：z-index要比Entry Point更高，以防被遮挡 */
-  z-index: 21;
+  bottom: 100px;
+  right: 24px;
+  z-index: 50;
+}
+
+.fab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-full);
+  background: var(--glass-bg-strong);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-lg);
+  color: var(--color-text);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.fab:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-xl);
+  background: white;
+}
+
+.fab:active {
+  transform: translateY(0);
 }
 </style>

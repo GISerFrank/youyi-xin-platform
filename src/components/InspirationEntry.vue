@@ -1,54 +1,111 @@
 <template>
-  <div class="entry-point" @click="handleClick">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="icon">
-      <path d="M9.58443 2.50002L8.20442 5.27002L5.43442 6.65002L8.20442 8.03002L9.58443 10.8L10.9644 8.03002L13.7344 6.65002L10.9644 5.27002L9.58443 2.50002ZM17.5844 8.80002L16.2044 11.57L13.4344 12.95L16.2044 14.33L17.5844 17.1L18.9644 14.33L21.7344 12.95L18.9644 11.57L17.5844 8.80002ZM17.5844 17.1L16.2044 19.87L13.4344 21.25L16.2044 22.63L17.5844 25.4L18.9644 22.63L21.7344 21.25L18.9644 19.87L17.5844 17.1Z" />
-    </svg>
-    <span>寻找灵感</span>
-  </div>
+  <button class="inspiration-entry" @click="handleClick">
+    <span class="entry-glow"></span>
+    <span class="entry-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+        <path 
+          d="M12 2L14.4 8.4L21 9.2L16 14L17.6 21L12 17.6L6.4 21L8 14L3 9.2L9.6 8.4L12 2Z" 
+          fill="currentColor"
+        />
+      </svg>
+    </span>
+    <span class="entry-text">寻找灵感</span>
+    <span class="entry-arrow">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="9 18 15 12 9 6"/>
+      </svg>
+    </span>
+  </button>
 </template>
 
 <script setup>
-// 定义组件会触发的自定义事件
 const emit = defineEmits(['activate']);
 
 const handleClick = () => {
-  // 当被点击时，向父组件发送一个 'activate' 信号
   emit('activate');
 };
 </script>
 
 <style scoped>
-.entry-point {
+.inspiration-entry {
   position: absolute;
-  bottom: 30px;
-  right: 30px;
-  z-index: 20; /* 比泡泡的层级更高 */
-
+  bottom: 32px;
+  right: 24px;
+  z-index: 40;
+  
   display: flex;
   align-items: center;
-  padding: 10px 20px;
-
-  background-color: #ffffff;
-  border-radius: 50px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-
+  gap: 10px;
+  padding: 14px 22px;
+  
+  background: linear-gradient(135deg, var(--terracotta) 0%, var(--terracotta-dark) 100%);
+  border: none;
+  border-radius: var(--radius-full);
+  box-shadow: 
+    0 4px 20px rgba(198, 123, 92, 0.35),
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+  
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: var(--font-body);
+  
   cursor: pointer;
-  transition: all 0.3s ease;
-
-  color: #333;
-  font-size: 16px;
-  font-weight: 500;
+  overflow: hidden;
+  transition: all var(--transition-normal);
 }
 
-.entry-point:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+.inspiration-entry:hover {
+  transform: translateY(-3px);
+  box-shadow: 
+    0 8px 30px rgba(198, 123, 92, 0.45),
+    0 0 0 1px rgba(255, 255, 255, 0.15) inset;
 }
 
-.icon {
-  width: 24px;
-  height: 24px;
-  margin-right: 8px;
-  color: #6a88e0;
+.inspiration-entry:hover .entry-glow {
+  opacity: 1;
+  transform: translateX(100%);
+}
+
+.inspiration-entry:hover .entry-arrow {
+  transform: translateX(3px);
+}
+
+.inspiration-entry:active {
+  transform: translateY(-1px);
+}
+
+.entry-glow {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  opacity: 0;
+  transition: all 0.6s ease;
+}
+
+.entry-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.entry-text {
+  letter-spacing: 0.5px;
+}
+
+.entry-arrow {
+  display: flex;
+  align-items: center;
+  opacity: 0.8;
+  transition: transform var(--transition-fast);
 }
 </style>
