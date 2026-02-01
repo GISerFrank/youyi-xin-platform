@@ -279,11 +279,21 @@ const bubbles = ref([
 }
 
 /* 响应式 */
-@media (max-width: 480px) {
+@media (max-width: 768px) {
   .bubbles-container {
-    padding: 30px 20px;
-    margin: 20px;
-    width: calc(100% - 40px);
+    padding: 32px 24px;
+    margin: 16px;
+    width: calc(100% - 32px);
+    max-width: 360px;
+  }
+  
+  .bubbles-title {
+    font-size: 18px;
+    margin-bottom: 24px;
+  }
+  
+  .title-icon {
+    font-size: 20px;
   }
   
   .bubbles-grid {
@@ -292,8 +302,60 @@ const bubbles = ref([
   }
   
   .bubble {
-    width: 120px;
-    height: 120px;
+    width: 130px;
+    height: 130px;
+    padding: 16px;
+  }
+  
+  .bubble-icon {
+    font-size: 32px;
+    margin-bottom: 8px;
+  }
+  
+  .bubble-label {
+    font-size: 13px;
+  }
+  
+  .bubble-hint {
+    font-size: 11px;
+  }
+  
+  .close-btn {
+    top: 12px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+  }
+}
+
+@media (max-width: 480px) {
+  .bubbles-container {
+    padding: 28px 20px;
+    margin: 12px;
+    width: calc(100% - 24px);
+  }
+  
+  .bubbles-title {
+    font-size: 16px;
+    margin-bottom: 20px;
+  }
+  
+  .bubbles-grid {
+    gap: 10px;
+  }
+  
+  .bubble {
+    width: 110px;
+    height: 110px;
+    padding: 14px;
+  }
+  
+  .bubble-icon {
+    font-size: 28px;
+  }
+  
+  .bubble-label {
+    font-size: 12px;
   }
 }
 </style>

@@ -577,4 +577,297 @@ const getCategoryClass = (category) => {
 .fab:active {
   transform: translateY(0);
 }
+
+/* ==================== 移动端适配 ==================== */
+
+/* 平板适配 */
+@media (max-width: 1024px) {
+  .sidebar {
+    width: 320px;
+  }
+  
+  .pill-text {
+    display: none;
+  }
+  
+  .pill {
+    padding: 8px 10px;
+  }
+  
+  .action-btn span {
+    display: none;
+  }
+  
+  .action-btn {
+    padding: 8px;
+  }
+}
+
+/* 手机适配 */
+@media (max-width: 768px) {
+  .app-container {
+    flex-direction: column;
+  }
+  
+  /* 顶部导航调整 */
+  .app-header {
+    height: auto;
+    padding: 12px 16px;
+    flex-direction: column;
+    gap: 12px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+  }
+  
+  .header-left {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .logo-icon {
+    font-size: 20px;
+  }
+  
+  .logo-text {
+    font-size: 18px;
+  }
+  
+  .logo-subtitle {
+    font-size: 12px;
+  }
+  
+  .header-nav {
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+  }
+  
+  .category-pills {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  
+  .pill {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+  
+  .pill-icon {
+    font-size: 12px;
+  }
+  
+  .pill-text {
+    display: inline;
+  }
+  
+  .nav-divider {
+    display: none;
+  }
+  
+  .nav-actions {
+    display: none;
+  }
+  
+  .stats-badge {
+    padding: 4px 10px;
+    font-size: 12px;
+  }
+  
+  /* 主体内容调整 */
+  .app-main {
+    flex-direction: column;
+    padding-top: 130px; /* 为固定header留出空间 */
+  }
+  
+  /* 侧边栏变为底部抽屉 */
+  .sidebar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 45vh;
+    max-height: 400px;
+    border-right: none;
+    border-top: 1px solid var(--glass-border);
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    z-index: 100;
+    transition: transform 0.3s ease, height 0.3s ease;
+  }
+  
+  .sidebar::before {
+    content: '';
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 4px;
+    background: var(--color-border);
+    border-radius: var(--radius-full);
+  }
+  
+  .sidebar-header {
+    padding: 20px 16px 12px;
+  }
+  
+  .search-input {
+    padding: 10px 36px 10px 40px;
+    font-size: 14px;
+  }
+  
+  .category-stats {
+    margin-top: 12px;
+    gap: 6px;
+  }
+  
+  .stat-tag {
+    padding: 3px 8px;
+    font-size: 11px;
+  }
+  
+  .merchant-list {
+    padding: 12px;
+    gap: 10px;
+  }
+  
+  /* 地图区域调整 */
+  .map-section {
+    height: calc(55vh - 130px);
+    min-height: 250px;
+  }
+  
+  /* 浮动按钮调整 */
+  .floating-actions {
+    bottom: calc(45vh + 16px);
+    right: 16px;
+  }
+  
+  .fab {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+/* 小屏手机适配 */
+@media (max-width: 480px) {
+  .app-header {
+    padding: 10px 12px;
+    gap: 10px;
+  }
+  
+  .logo-text {
+    font-size: 16px;
+  }
+  
+  .category-pills {
+    gap: 4px;
+  }
+  
+  .pill {
+    padding: 5px 8px;
+    font-size: 11px;
+  }
+  
+  .pill-icon {
+    font-size: 11px;
+  }
+  
+  .app-main {
+    padding-top: 120px;
+  }
+  
+  .sidebar {
+    height: 50vh;
+    max-height: 350px;
+  }
+  
+  .sidebar-header {
+    padding: 16px 12px 10px;
+  }
+  
+  .merchant-list {
+    padding: 10px;
+    gap: 8px;
+  }
+  
+  .map-section {
+    height: calc(50vh - 120px);
+    min-height: 200px;
+  }
+  
+  .floating-actions {
+    bottom: calc(50vh + 12px);
+    right: 12px;
+  }
+  
+  .fab {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .fab svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+/* 横屏模式适配 */
+@media (max-width: 768px) and (orientation: landscape) {
+  .app-header {
+    flex-direction: row;
+    padding: 8px 16px;
+  }
+  
+  .header-left {
+    width: auto;
+  }
+  
+  .header-nav {
+    width: auto;
+    flex: 1;
+    justify-content: flex-end;
+  }
+  
+  .category-pills {
+    width: auto;
+  }
+  
+  .app-main {
+    flex-direction: row;
+    padding-top: 60px;
+  }
+  
+  .sidebar {
+    position: relative;
+    bottom: auto;
+    left: auto;
+    right: auto;
+    width: 280px;
+    height: 100%;
+    max-height: none;
+    border-radius: 0;
+    border-right: 1px solid var(--glass-border);
+    border-top: none;
+  }
+  
+  .sidebar::before {
+    display: none;
+  }
+  
+  .map-section {
+    height: 100%;
+    min-height: auto;
+  }
+  
+  .floating-actions {
+    bottom: 16px;
+  }
+}
 </style>

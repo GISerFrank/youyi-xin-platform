@@ -108,4 +108,47 @@ const handleClick = () => {
   opacity: 0.8;
   transition: transform var(--transition-fast);
 }
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .inspiration-entry {
+    bottom: calc(45vh + 70px);
+    right: 16px;
+    padding: 12px 18px;
+    font-size: 14px;
+    gap: 8px;
+  }
+  
+  .entry-icon svg {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .entry-arrow svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .inspiration-entry {
+    bottom: calc(50vh + 60px);
+    right: 12px;
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+  
+  .entry-icon svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+/* 横屏模式 */
+@media (max-width: 768px) and (orientation: landscape) {
+  .inspiration-entry {
+    bottom: 70px;
+    right: 16px;
+  }
+}
 </style>
