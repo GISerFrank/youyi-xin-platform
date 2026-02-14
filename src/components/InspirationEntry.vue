@@ -112,43 +112,47 @@ const handleClick = () => {
 /* 移动端适配 */
 @media (max-width: 768px) {
   .inspiration-entry {
-    bottom: calc(45vh + 70px);
-    right: 16px;
-    padding: 12px 18px;
-    font-size: 14px;
-    gap: 8px;
-  }
-  
-  .entry-icon svg {
-    width: 18px;
-    height: 18px;
-  }
-  
-  .entry-arrow svg {
-    width: 14px;
-    height: 14px;
-  }
-}
-
-@media (max-width: 480px) {
-  .inspiration-entry {
-    bottom: calc(50vh + 60px);
+    bottom: calc(40vh + 56px);
     right: 12px;
-    padding: 10px 16px;
-    font-size: 13px;
+    padding: 10px 14px;
+    font-size: 12px;
+    gap: 6px;
   }
   
   .entry-icon svg {
     width: 16px;
     height: 16px;
   }
+  
+  .entry-arrow svg {
+    width: 12px;
+    height: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .inspiration-entry {
+    bottom: calc(38vh + 48px);
+    right: 10px;
+    padding: 8px 12px;
+    font-size: 11px;
+  }
+  
+  .entry-icon svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .entry-arrow {
+    display: none;
+  }
 }
 
 /* 横屏模式 */
-@media (max-width: 768px) and (orientation: landscape) {
+@media (max-width: 900px) and (orientation: landscape) {
   .inspiration-entry {
-    bottom: 70px;
-    right: 16px;
+    bottom: 56px;
+    right: 12px;
   }
 }
 </style>

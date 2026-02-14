@@ -609,12 +609,12 @@ const getCategoryClass = (category) => {
     flex-direction: column;
   }
   
-  /* 顶部导航调整 */
+  /* 顶部导航调整 - 更紧凑的单行布局 */
   .app-header {
-    height: auto;
-    padding: 12px 16px;
-    flex-direction: column;
-    gap: 12px;
+    height: 56px;
+    padding: 0 12px;
+    flex-direction: row;
+    gap: 8px;
     position: fixed;
     top: 0;
     left: 0;
@@ -623,43 +623,54 @@ const getCategoryClass = (category) => {
   }
   
   .header-left {
-    width: 100%;
-    justify-content: center;
+    flex-shrink: 0;
+  }
+  
+  .logo {
+    gap: 2px;
   }
   
   .logo-icon {
-    font-size: 20px;
+    font-size: 18px;
+    margin-right: 4px;
   }
   
   .logo-text {
-    font-size: 18px;
+    font-size: 16px;
   }
   
   .logo-subtitle {
-    font-size: 12px;
+    font-size: 11px;
   }
   
   .header-nav {
-    width: 100%;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 8px;
+    flex: 1;
+    justify-content: flex-end;
+    gap: 6px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  
+  .header-nav::-webkit-scrollbar {
+    display: none;
   }
   
   .category-pills {
-    width: 100%;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 6px;
+    flex-wrap: nowrap;
+    gap: 4px;
   }
   
   .pill {
-    padding: 6px 10px;
-    font-size: 12px;
+    padding: 6px 8px;
+    font-size: 11px;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
   
   .pill-icon {
-    font-size: 12px;
+    font-size: 11px;
   }
   
   .pill-text {
@@ -675,14 +686,23 @@ const getCategoryClass = (category) => {
   }
   
   .stats-badge {
-    padding: 4px 10px;
-    font-size: 12px;
+    padding: 4px 8px;
+    font-size: 11px;
+    flex-shrink: 0;
   }
   
   /* 主体内容调整 */
   .app-main {
     flex-direction: column;
-    padding-top: 130px; /* 为固定header留出空间 */
+    padding-top: 56px;
+    height: 100vh;
+  }
+  
+  /* 地图区域调整 - 占据更多空间 */
+  .map-section {
+    flex: 1;
+    min-height: 0;
+    order: 1;
   }
   
   /* 侧边栏变为底部抽屉 */
@@ -692,13 +712,13 @@ const getCategoryClass = (category) => {
     left: 0;
     right: 0;
     width: 100%;
-    height: 45vh;
-    max-height: 400px;
+    height: 40vh;
+    max-height: 320px;
     border-right: none;
     border-top: 1px solid var(--glass-border);
-    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
     z-index: 100;
-    transition: transform 0.3s ease, height 0.3s ease;
+    order: 2;
   }
   
   .sidebar::before {
@@ -707,103 +727,50 @@ const getCategoryClass = (category) => {
     top: 8px;
     left: 50%;
     transform: translateX(-50%);
-    width: 40px;
+    width: 36px;
     height: 4px;
     background: var(--color-border);
     border-radius: var(--radius-full);
+    z-index: 1;
   }
   
   .sidebar-header {
-    padding: 20px 16px 12px;
+    padding: 18px 12px 8px;
+  }
+  
+  .search-box {
+    margin-bottom: 0;
   }
   
   .search-input {
-    padding: 10px 36px 10px 40px;
-    font-size: 14px;
+    padding: 8px 32px 8px 36px;
+    font-size: 13px;
+  }
+  
+  .search-icon {
+    left: 10px;
+    width: 16px;
+    height: 16px;
   }
   
   .category-stats {
-    margin-top: 12px;
-    gap: 6px;
+    margin-top: 8px;
+    gap: 4px;
   }
   
   .stat-tag {
-    padding: 3px 8px;
-    font-size: 11px;
+    padding: 2px 6px;
+    font-size: 10px;
   }
   
   .merchant-list {
-    padding: 12px;
-    gap: 10px;
-  }
-  
-  /* 地图区域调整 */
-  .map-section {
-    height: calc(55vh - 130px);
-    min-height: 250px;
+    padding: 8px 12px;
+    gap: 8px;
   }
   
   /* 浮动按钮调整 */
   .floating-actions {
-    bottom: calc(45vh + 16px);
-    right: 16px;
-  }
-  
-  .fab {
-    width: 44px;
-    height: 44px;
-  }
-}
-
-/* 小屏手机适配 */
-@media (max-width: 480px) {
-  .app-header {
-    padding: 10px 12px;
-    gap: 10px;
-  }
-  
-  .logo-text {
-    font-size: 16px;
-  }
-  
-  .category-pills {
-    gap: 4px;
-  }
-  
-  .pill {
-    padding: 5px 8px;
-    font-size: 11px;
-  }
-  
-  .pill-icon {
-    font-size: 11px;
-  }
-  
-  .app-main {
-    padding-top: 120px;
-  }
-  
-  .sidebar {
-    height: 50vh;
-    max-height: 350px;
-  }
-  
-  .sidebar-header {
-    padding: 16px 12px 10px;
-  }
-  
-  .merchant-list {
-    padding: 10px;
-    gap: 8px;
-  }
-  
-  .map-section {
-    height: calc(50vh - 120px);
-    min-height: 200px;
-  }
-  
-  .floating-actions {
-    bottom: calc(50vh + 12px);
+    bottom: calc(40vh + 12px);
     right: 12px;
   }
   
@@ -818,30 +785,104 @@ const getCategoryClass = (category) => {
   }
 }
 
-/* 横屏模式适配 */
-@media (max-width: 768px) and (orientation: landscape) {
+/* 小屏手机适配 */
+@media (max-width: 480px) {
   .app-header {
-    flex-direction: row;
-    padding: 8px 16px;
+    height: 50px;
+    padding: 0 8px;
   }
   
-  .header-left {
-    width: auto;
+  .logo-icon {
+    font-size: 16px;
   }
   
-  .header-nav {
-    width: auto;
-    flex: 1;
-    justify-content: flex-end;
+  .logo-text {
+    font-size: 14px;
+  }
+  
+  .logo-subtitle {
+    display: none;
   }
   
   .category-pills {
-    width: auto;
+    gap: 3px;
+  }
+  
+  .pill {
+    padding: 5px 6px;
+    font-size: 10px;
+  }
+  
+  .pill-icon {
+    font-size: 10px;
+  }
+  
+  .stats-badge {
+    padding: 3px 6px;
+    font-size: 10px;
+  }
+  
+  .app-main {
+    padding-top: 50px;
+  }
+  
+  .sidebar {
+    height: 38vh;
+    max-height: 280px;
+  }
+  
+  .sidebar-header {
+    padding: 14px 10px 6px;
+  }
+  
+  .search-input {
+    padding: 6px 28px 6px 32px;
+    font-size: 12px;
+  }
+  
+  .category-stats {
+    margin-top: 6px;
+  }
+  
+  .merchant-list {
+    padding: 6px 10px;
+    gap: 6px;
+  }
+  
+  .floating-actions {
+    bottom: calc(38vh + 10px);
+    right: 10px;
+  }
+  
+  .fab {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .fab svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+/* 横屏模式适配 */
+@media (max-width: 900px) and (orientation: landscape) {
+  .app-header {
+    height: 44px;
+    padding: 0 12px;
+  }
+  
+  .logo-icon {
+    font-size: 16px;
+  }
+  
+  .logo-text {
+    font-size: 14px;
   }
   
   .app-main {
     flex-direction: row;
-    padding-top: 60px;
+    padding-top: 44px;
   }
   
   .sidebar {
@@ -849,12 +890,13 @@ const getCategoryClass = (category) => {
     bottom: auto;
     left: auto;
     right: auto;
-    width: 280px;
+    width: 260px;
     height: 100%;
     max-height: none;
     border-radius: 0;
     border-right: 1px solid var(--glass-border);
     border-top: none;
+    order: 1;
   }
   
   .sidebar::before {
@@ -862,12 +904,13 @@ const getCategoryClass = (category) => {
   }
   
   .map-section {
-    height: 100%;
-    min-height: auto;
+    flex: 1;
+    order: 2;
   }
   
   .floating-actions {
-    bottom: 16px;
+    bottom: 12px;
+    right: 12px;
   }
 }
 </style>

@@ -252,16 +252,105 @@ const truncateText = (text, maxLength) => {
 
 /* 响应式 */
 @media (max-width: 768px) {
+  .merchant-card {
+    display: flex;
+    flex-direction: row;
+    border-radius: var(--radius-md);
+  }
+  
+  .merchant-card:hover {
+    transform: none;
+  }
+  
   .card-cover {
-    height: 120px;
+    width: 100px;
+    height: 100px;
+    flex-shrink: 0;
+    border-radius: var(--radius-md) 0 0 var(--radius-md);
+  }
+  
+  .category-badge {
+    top: 6px;
+    left: 6px;
+    padding: 3px 6px;
+    font-size: 9px;
   }
   
   .card-body {
-    padding: 12px;
+    flex: 1;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
   }
   
   .card-title {
-    font-size: 15px;
+    font-size: 14px;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .card-address {
+    font-size: 11px;
+    margin-bottom: 4px;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .card-address svg {
+    width: 12px;
+    height: 12px;
+    margin-top: 1px;
+  }
+  
+  .card-desc {
+    display: none;
+  }
+  
+  .card-hours {
+    font-size: 10px;
+  }
+  
+  .card-hours svg {
+    width: 12px;
+    height: 12px;
+  }
+  
+  .card-hover-hint {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .card-cover {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .category-badge {
+    padding: 2px 5px;
+    font-size: 8px;
+  }
+  
+  .card-body {
+    padding: 8px 10px;
+  }
+  
+  .card-title {
+    font-size: 13px;
+  }
+  
+  .card-address {
+    font-size: 10px;
+  }
+  
+  .card-hours {
+    font-size: 9px;
   }
 }
 </style>
