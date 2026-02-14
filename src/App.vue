@@ -9,22 +9,32 @@
           <span class="logo-subtitle">· 大理</span>
         </div>
       </div>
-      
+
       <nav class="header-nav">
         <div class="category-pills">
+          <!-- 移动端显示全部按钮 -->
           <button
-            v-for="category in categories"
-            :key="category"
-            :class="['pill', { active: selectedCategory === category }]"
-            @click="handleCategorySelect(category)"
+              class="pill pill-all"
+              :class="{ active: selectedCategory === '全部' }"
+              @click="resetFilters"
+          >
+            <span class="pill-icon">📍</span>
+            <span class="pill-text">全部</span>
+          </button>
+
+          <button
+              v-for="category in categories"
+              :key="category"
+              :class="['pill', { active: selectedCategory === category }]"
+              @click="handleCategorySelect(category)"
           >
             <span class="pill-icon">{{ getCategoryIcon(category) }}</span>
             <span class="pill-text">{{ category }}</span>
           </button>
         </div>
-        
+
         <div class="nav-divider"></div>
-        
+
         <div class="nav-actions">
           <button class="action-btn" @click="resetFilters">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -40,7 +50,7 @@
             <span>适应视图</span>
           </button>
         </div>
-        
+
         <div class="stats-badge">
           <span class="stats-current">{{ filteredMerchants.length }}</span>
           <span class="stats-divider">/</span>
@@ -52,12 +62,12 @@
     <!-- 主体内容 -->
     <main class="app-main">
       <!-- 移动端遮罩层 -->
-      <div 
-        v-if="isMobileDrawerOpen" 
-        class="mobile-overlay"
-        @click="closeMobileDrawer"
+      <div
+          v-if="isMobileDrawerOpen"
+          class="mobile-overlay"
+          @click="closeMobileDrawer"
       ></div>
-      
+
       <!-- 侧边栏 - 玻璃拟态 -->
       <aside class="sidebar" :class="{ 'drawer-visible': isMobileDrawerOpen }">
         <!-- 移动端抽屉头部 -->
@@ -75,18 +85,18 @@
             </svg>
           </button>
         </div>
-        
+
         <div class="sidebar-header">
           <div class="search-box">
             <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="11" cy="11" r="8"/>
               <path d="m21 21-4.35-4.35"/>
             </svg>
-            <input 
-              v-model="searchText" 
-              type="text" 
-              placeholder="搜索商家名称..." 
-              class="search-input"
+            <input
+                v-model="searchText"
+                type="text"
+                placeholder="搜索商家名称..."
+                class="search-input"
             />
             <button v-if="searchText" class="search-clear" @click="searchText = ''">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -95,26 +105,26 @@
               </svg>
             </button>
           </div>
-          
+
           <div class="category-stats">
-            <span 
-              v-for="(count, category) in categoryStats" 
-              :key="category"
-              :class="['stat-tag', getCategoryClass(category)]"
+            <span
+                v-for="(count, category) in categoryStats"
+                :key="category"
+                :class="['stat-tag', getCategoryClass(category)]"
             >
               {{ getCategoryIcon(category) }} {{ category }} · {{ count }}
             </span>
           </div>
         </div>
-        
+
         <div class="merchant-list">
           <MerchantCard
-            v-for="merchant in filteredMerchants"
-            :key="merchant.id"
-            :merchant="merchant"
-            @click="handleMerchantSelect(merchant)"
+              v-for="merchant in filteredMerchants"
+              :key="merchant.id"
+              :merchant="merchant"
+              @click="handleMerchantSelect(merchant)"
           />
-          
+
           <div v-if="filteredMerchants.length === 0" class="empty-state">
             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
               <circle cx="12" cy="12" r="10"/>
@@ -130,21 +140,21 @@
       <!-- 地图区域 -->
       <section class="map-section">
         <MapView
-          ref="mapViewRef"
-          :merchants="filteredMerchants"
-          @marker-click="handleMerchantSelect"
+            ref="mapViewRef"
+            :merchants="filteredMerchants"
+            @marker-click="handleMerchantSelect"
         />
-        
+
         <!-- 灵感入口 -->
         <InspirationEntry v-if="!showBubbles" @activate="handleActivateBubbles" />
-        
+
         <!-- 灵感泡泡 -->
         <InspirationBubbles
-          v-if="showBubbles"
-          @dismiss="handleDismissBubbles"
-          @select-category="handleCategorySelect"
+            v-if="showBubbles"
+            @dismiss="handleDismissBubbles"
+            @select-category="handleCategorySelect"
         />
-        
+
         <!-- 浮动操作按钮 -->
         <div class="floating-actions">
           <button class="fab" @click="resetView" title="回到初始视图">
@@ -234,19 +244,19 @@ const handleDismissBubbles = () => { showBubbles.value = false; };
 const handleCategorySelect = (category) => {
   selectedCategory.value = category;
   handleDismissBubbles();
-  
+
   // 移动端：点击分类时打开抽屉
   if (isMobile.value) {
     isMobileDrawerOpen.value = true;
   }
-  
+
   fitView();
 };
 
 const handleMerchantSelect = (merchant) => {
   if (mapViewRef.value) {
     mapViewRef.value.flyTo(merchant);
-    
+
     // 移动端：选择商家后关闭抽屉，并延迟显示详情弹窗
     if (isMobile.value) {
       closeMobileDrawer();
@@ -262,11 +272,15 @@ const resetFilters = () => {
   selectedCategory.value = '全部';
   searchText.value = '';
   closeMobileDrawer();
-  ElMessage({
-    message: '已重置所有筛选',
-    type: 'success',
-    customClass: 'custom-message'
-  });
+
+  // 桌面端显示提示消息
+  if (!isMobile.value) {
+    ElMessage({
+      message: '已重置所有筛选',
+      type: 'success',
+      customClass: 'custom-message'
+    });
+  }
 };
 
 const fitView = () => {
@@ -289,21 +303,21 @@ const resetView = () => {
 
 // 辅助方法
 const getCategoryIcon = (category) => {
-  const icons = { 
-    '书店与咖啡': '☕', 
-    '特色餐饮': '🍜', 
-    '手工艺': '🎨', 
-    '民宿': '🏠' 
+  const icons = {
+    '书店与咖啡': '☕',
+    '特色餐饮': '🍜',
+    '手工艺': '🎨',
+    '民宿': '🏠'
   };
   return icons[category] || '📍';
 };
 
 const getCategoryClass = (category) => {
-  const classes = { 
-    '书店与咖啡': 'cafe', 
-    '特色餐饮': 'food', 
-    '手工艺': 'craft', 
-    '民宿': 'hotel' 
+  const classes = {
+    '书店与咖啡': 'cafe',
+    '特色餐饮': 'food',
+    '手工艺': 'craft',
+    '民宿': 'hotel'
   };
   return classes[category] || '';
 };
@@ -416,6 +430,11 @@ const getCategoryClass = (category) => {
 
 .pill-icon {
   font-size: 14px;
+}
+
+/* 全部按钮 - 桌面端隐藏 */
+.pill-all {
+  display: none;
 }
 
 .nav-divider {
@@ -651,19 +670,19 @@ const getCategoryClass = (category) => {
   .sidebar {
     width: 320px;
   }
-  
+
   .pill-text {
     display: none;
   }
-  
+
   .pill {
     padding: 8px 10px;
   }
-  
+
   .action-btn span {
     display: none;
   }
-  
+
   .action-btn {
     padding: 8px;
   }
@@ -674,7 +693,7 @@ const getCategoryClass = (category) => {
   .app-container {
     flex-direction: column;
   }
-  
+
   /* 顶部导航调整 - 更紧凑的单行布局 */
   .app-header {
     height: 56px;
@@ -687,28 +706,28 @@ const getCategoryClass = (category) => {
     right: 0;
     z-index: 1000;
   }
-  
+
   .header-left {
     flex-shrink: 0;
   }
-  
+
   .logo {
     gap: 2px;
   }
-  
+
   .logo-icon {
     font-size: 18px;
     margin-right: 4px;
   }
-  
+
   .logo-text {
     font-size: 16px;
   }
-  
+
   .logo-subtitle {
     font-size: 11px;
   }
-  
+
   .header-nav {
     flex: 1;
     justify-content: flex-end;
@@ -718,57 +737,62 @@ const getCategoryClass = (category) => {
     scrollbar-width: none;
     -ms-overflow-style: none;
   }
-  
+
   .header-nav::-webkit-scrollbar {
     display: none;
   }
-  
+
   .category-pills {
     flex-wrap: nowrap;
     gap: 4px;
   }
-  
+
   .pill {
     padding: 6px 10px;
     font-size: 12px;
     white-space: nowrap;
     flex-shrink: 0;
   }
-  
+
   .pill-icon {
     font-size: 12px;
   }
-  
+
   .pill-text {
     display: inline;
   }
-  
+
+  /* 移动端显示全部按钮 */
+  .pill-all {
+    display: flex;
+  }
+
   .nav-divider {
     display: none;
   }
-  
+
   .nav-actions {
     display: none;
   }
-  
+
   .stats-badge {
     display: none;
   }
-  
+
   /* 主体内容调整 */
   .app-main {
     flex-direction: column;
     padding-top: 56px;
     height: 100vh;
   }
-  
+
   /* 地图区域 - 全屏显示 */
   .map-section {
     flex: 1;
     min-height: 0;
     height: calc(100vh - 56px);
   }
-  
+
   /* 移动端遮罩层 */
   .mobile-overlay {
     display: block;
@@ -779,11 +803,11 @@ const getCategoryClass = (category) => {
     opacity: 0;
     animation: fadeIn 0.3s ease forwards;
   }
-  
+
   @keyframes fadeIn {
     to { opacity: 1; }
   }
-  
+
   /* 侧边栏变为底部抽屉 - 默认隐藏 */
   .sidebar {
     position: fixed;
@@ -801,11 +825,11 @@ const getCategoryClass = (category) => {
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
   }
-  
+
   .sidebar.drawer-visible {
     transform: translateY(0);
   }
-  
+
   /* 抽屉头部样式 */
   .drawer-header {
     display: flex;
@@ -815,7 +839,7 @@ const getCategoryClass = (category) => {
     border-bottom: 1px solid var(--color-border);
     position: relative;
   }
-  
+
   .drawer-handle {
     position: absolute;
     top: 6px;
@@ -826,7 +850,7 @@ const getCategoryClass = (category) => {
     background: var(--color-border);
     border-radius: var(--radius-full);
   }
-  
+
   .drawer-title {
     display: flex;
     align-items: center;
@@ -836,11 +860,11 @@ const getCategoryClass = (category) => {
     color: var(--color-text);
     padding-top: 4px;
   }
-  
+
   .drawer-title-icon {
     font-size: 16px;
   }
-  
+
   .drawer-count {
     font-size: 12px;
     font-weight: 500;
@@ -849,7 +873,7 @@ const getCategoryClass = (category) => {
     padding: 2px 8px;
     border-radius: var(--radius-full);
   }
-  
+
   .drawer-close {
     display: flex;
     align-items: center;
@@ -862,63 +886,63 @@ const getCategoryClass = (category) => {
     margin-top: 4px;
     transition: all var(--transition-fast);
   }
-  
+
   .drawer-close:active {
     background: var(--terracotta);
     color: white;
   }
-  
+
   .sidebar-header {
     padding: 12px 16px 8px;
   }
-  
+
   .search-box {
     margin-bottom: 0;
   }
-  
+
   .search-input {
     padding: 10px 36px 10px 40px;
     font-size: 14px;
   }
-  
+
   .search-icon {
     left: 12px;
     width: 16px;
     height: 16px;
   }
-  
+
   .category-stats {
     margin-top: 10px;
     gap: 6px;
   }
-  
+
   .stat-tag {
     padding: 3px 8px;
     font-size: 11px;
   }
-  
+
   .merchant-list {
     padding: 12px 16px;
     gap: 10px;
     max-height: calc(60vh - 160px);
   }
-  
+
   /* 浮动按钮调整 - 始终在地图右下角 */
   .floating-actions {
     bottom: 24px;
     right: 16px;
   }
-  
+
   /* 抽屉打开时浮动按钮位置调整 */
   .drawer-open .floating-actions {
     bottom: calc(60vh + 16px);
   }
-  
+
   .fab {
     width: 44px;
     height: 44px;
   }
-  
+
   .fab svg {
     width: 20px;
     height: 20px;
@@ -931,82 +955,82 @@ const getCategoryClass = (category) => {
     height: 50px;
     padding: 0 10px;
   }
-  
+
   .logo-icon {
     font-size: 16px;
   }
-  
+
   .logo-text {
     font-size: 14px;
   }
-  
+
   .logo-subtitle {
     display: none;
   }
-  
+
   .category-pills {
     gap: 4px;
   }
-  
+
   .pill {
     padding: 5px 8px;
     font-size: 11px;
   }
-  
+
   .pill-icon {
     font-size: 11px;
   }
-  
+
   .app-main {
     padding-top: 50px;
   }
-  
+
   .map-section {
     height: calc(100vh - 50px);
   }
-  
+
   .sidebar {
     height: 55vh;
     max-height: 450px;
   }
-  
+
   .drawer-header {
     padding: 10px 12px;
   }
-  
+
   .drawer-title {
     font-size: 14px;
   }
-  
+
   .sidebar-header {
     padding: 10px 12px 6px;
   }
-  
+
   .search-input {
     padding: 8px 32px 8px 36px;
     font-size: 13px;
   }
-  
+
   .merchant-list {
     padding: 10px 12px;
     gap: 8px;
     max-height: calc(55vh - 140px);
   }
-  
+
   .floating-actions {
     bottom: 20px;
     right: 12px;
   }
-  
+
   .drawer-open .floating-actions {
     bottom: calc(55vh + 12px);
   }
-  
+
   .fab {
     width: 40px;
     height: 40px;
   }
-  
+
   .fab svg {
     width: 18px;
     height: 18px;
@@ -1018,7 +1042,7 @@ const getCategoryClass = (category) => {
   .mobile-overlay {
     display: none !important;
   }
-  
+
   .drawer-header {
     display: none !important;
   }
@@ -1030,24 +1054,24 @@ const getCategoryClass = (category) => {
     height: 44px;
     padding: 0 12px;
   }
-  
+
   .logo-icon {
     font-size: 16px;
   }
-  
+
   .logo-text {
     font-size: 14px;
   }
-  
+
   .app-main {
     flex-direction: row;
     padding-top: 44px;
   }
-  
+
   .mobile-overlay {
     display: none !important;
   }
-  
+
   .sidebar {
     position: relative;
     bottom: auto;
@@ -1061,16 +1085,16 @@ const getCategoryClass = (category) => {
     border-top: none;
     transform: none;
   }
-  
+
   .drawer-header {
     display: none;
   }
-  
+
   .map-section {
     flex: 1;
     height: 100%;
   }
-  
+
   .floating-actions {
     bottom: 16px;
     right: 16px;
