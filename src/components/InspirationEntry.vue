@@ -112,10 +112,10 @@ const handleClick = () => {
 /* 移动端适配 */
 @media (max-width: 768px) {
   .inspiration-entry {
-    bottom: calc(40vh + 56px);
-    right: 12px;
-    padding: 10px 14px;
-    font-size: 12px;
+    bottom: 80px;
+    right: 16px;
+    padding: 10px 16px;
+    font-size: 13px;
     gap: 6px;
   }
   
@@ -132,10 +132,10 @@ const handleClick = () => {
 
 @media (max-width: 480px) {
   .inspiration-entry {
-    bottom: calc(38vh + 48px);
-    right: 10px;
-    padding: 8px 12px;
-    font-size: 11px;
+    bottom: 72px;
+    right: 12px;
+    padding: 8px 14px;
+    font-size: 12px;
   }
   
   .entry-icon svg {
@@ -151,8 +151,8 @@ const handleClick = () => {
 /* 横屏模式 */
 @media (max-width: 900px) and (orientation: landscape) {
   .inspiration-entry {
-    bottom: 56px;
-    right: 12px;
+    bottom: 60px;
+    right: 16px;
   }
 }
 </style>

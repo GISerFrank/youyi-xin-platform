@@ -1,5 +1,5 @@
 <template>
-  <div class="app-container">
+  <div class="app-container" :class="{ 'drawer-open': isMobileDrawerOpen }">
     <!-- 顶部导航 - 玻璃拟态效果 -->
     <header class="app-header">
       <div class="header-left">
@@ -51,8 +51,31 @@
 
     <!-- 主体内容 -->
     <main class="app-main">
+      <!-- 移动端遮罩层 -->
+      <div 
+        v-if="isMobileDrawerOpen" 
+        class="mobile-overlay"
+        @click="closeMobileDrawer"
+      ></div>
+      
       <!-- 侧边栏 - 玻璃拟态 -->
-      <aside class="sidebar">
+      <aside class="sidebar" :class="{ 'drawer-visible': isMobileDrawerOpen }">
+        <!-- 移动端抽屉头部 -->
+        <div class="drawer-header">
+          <span class="drawer-handle"></span>
+          <div class="drawer-title">
+            <span class="drawer-title-icon">{{ getCategoryIcon(selectedCategory) }}</span>
+            <span>{{ selectedCategory }}</span>
+            <span class="drawer-count">{{ filteredMerchants.length }}家</span>
+          </div>
+          <button class="drawer-close" @click="closeMobileDrawer">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+        
         <div class="sidebar-header">
           <div class="search-box">
             <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -137,7 +160,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { ElMessage } from 'element-plus';
 import allMerchants from '@/data/mockdata.json';
 import MerchantCard from '@/components/MerchantCard.vue';
@@ -154,6 +177,33 @@ const searchText = ref('');
 const selectedCategory = ref('全部');
 const showBubbles = ref(false);
 const categories = ['书店与咖啡', '特色餐饮', '手工艺', '民宿'];
+
+// 移动端抽屉状态
+const isMobile = ref(false);
+const isMobileDrawerOpen = ref(false);
+
+// 检测是否为移动端
+const checkMobile = () => {
+  isMobile.value = window.innerWidth <= 768;
+  // 如果切换到桌面端，关闭移动端抽屉状态
+  if (!isMobile.value) {
+    isMobileDrawerOpen.value = false;
+  }
+};
+
+onMounted(() => {
+  checkMobile();
+  window.addEventListener('resize', checkMobile);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('resize', checkMobile);
+});
+
+// 关闭移动端抽屉
+const closeMobileDrawer = () => {
+  isMobileDrawerOpen.value = false;
+};
 
 // 核心筛选逻辑
 const filteredMerchants = computed(() => {
@@ -184,18 +234,34 @@ const handleDismissBubbles = () => { showBubbles.value = false; };
 const handleCategorySelect = (category) => {
   selectedCategory.value = category;
   handleDismissBubbles();
+  
+  // 移动端：点击分类时打开抽屉
+  if (isMobile.value) {
+    isMobileDrawerOpen.value = true;
+  }
+  
   fitView();
 };
 
 const handleMerchantSelect = (merchant) => {
   if (mapViewRef.value) {
     mapViewRef.value.flyTo(merchant);
+    
+    // 移动端：选择商家后关闭抽屉，并延迟显示详情弹窗
+    if (isMobile.value) {
+      closeMobileDrawer();
+      // 等待地图飞行动画完成后显示详情弹窗
+      setTimeout(() => {
+        mapViewRef.value.showMerchantInfo(merchant);
+      }, 800);
+    }
   }
 };
 
 const resetFilters = () => {
   selectedCategory.value = '全部';
   searchText.value = '';
+  closeMobileDrawer();
   ElMessage({
     message: '已重置所有筛选',
     type: 'success',
@@ -663,14 +729,14 @@ const getCategoryClass = (category) => {
   }
   
   .pill {
-    padding: 6px 8px;
-    font-size: 11px;
+    padding: 6px 10px;
+    font-size: 12px;
     white-space: nowrap;
     flex-shrink: 0;
   }
   
   .pill-icon {
-    font-size: 11px;
+    font-size: 12px;
   }
   
   .pill-text {
@@ -686,9 +752,7 @@ const getCategoryClass = (category) => {
   }
   
   .stats-badge {
-    padding: 4px 8px;
-    font-size: 11px;
-    flex-shrink: 0;
+    display: none;
   }
   
   /* 主体内容调整 */
@@ -698,44 +762,114 @@ const getCategoryClass = (category) => {
     height: 100vh;
   }
   
-  /* 地图区域调整 - 占据更多空间 */
+  /* 地图区域 - 全屏显示 */
   .map-section {
     flex: 1;
     min-height: 0;
-    order: 1;
+    height: calc(100vh - 56px);
   }
   
-  /* 侧边栏变为底部抽屉 */
+  /* 移动端遮罩层 */
+  .mobile-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 99;
+    opacity: 0;
+    animation: fadeIn 0.3s ease forwards;
+  }
+  
+  @keyframes fadeIn {
+    to { opacity: 1; }
+  }
+  
+  /* 侧边栏变为底部抽屉 - 默认隐藏 */
   .sidebar {
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
     width: 100%;
-    height: 40vh;
-    max-height: 320px;
+    height: 60vh;
+    max-height: 500px;
     border-right: none;
     border-top: 1px solid var(--glass-border);
-    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
     z-index: 100;
-    order: 2;
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
   }
   
-  .sidebar::before {
-    content: '';
+  .sidebar.drawer-visible {
+    transform: translateY(0);
+  }
+  
+  /* 抽屉头部样式 */
+  .drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--color-border);
+    position: relative;
+  }
+  
+  .drawer-handle {
     position: absolute;
-    top: 8px;
+    top: 6px;
     left: 50%;
     transform: translateX(-50%);
     width: 36px;
     height: 4px;
     background: var(--color-border);
     border-radius: var(--radius-full);
-    z-index: 1;
+  }
+  
+  .drawer-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--color-text);
+    padding-top: 4px;
+  }
+  
+  .drawer-title-icon {
+    font-size: 16px;
+  }
+  
+  .drawer-count {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--color-text-soft);
+    background: var(--warm-cream-mute);
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+  }
+  
+  .drawer-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-full);
+    background: var(--warm-cream-mute);
+    color: var(--color-text-soft);
+    margin-top: 4px;
+    transition: all var(--transition-fast);
+  }
+  
+  .drawer-close:active {
+    background: var(--terracotta);
+    color: white;
   }
   
   .sidebar-header {
-    padding: 18px 12px 8px;
+    padding: 12px 16px 8px;
   }
   
   .search-box {
@@ -743,45 +877,51 @@ const getCategoryClass = (category) => {
   }
   
   .search-input {
-    padding: 8px 32px 8px 36px;
-    font-size: 13px;
+    padding: 10px 36px 10px 40px;
+    font-size: 14px;
   }
   
   .search-icon {
-    left: 10px;
+    left: 12px;
     width: 16px;
     height: 16px;
   }
   
   .category-stats {
-    margin-top: 8px;
-    gap: 4px;
+    margin-top: 10px;
+    gap: 6px;
   }
   
   .stat-tag {
-    padding: 2px 6px;
-    font-size: 10px;
+    padding: 3px 8px;
+    font-size: 11px;
   }
   
   .merchant-list {
-    padding: 8px 12px;
-    gap: 8px;
+    padding: 12px 16px;
+    gap: 10px;
+    max-height: calc(60vh - 160px);
   }
   
-  /* 浮动按钮调整 */
+  /* 浮动按钮调整 - 始终在地图右下角 */
   .floating-actions {
-    bottom: calc(40vh + 12px);
-    right: 12px;
+    bottom: 24px;
+    right: 16px;
+  }
+  
+  /* 抽屉打开时浮动按钮位置调整 */
+  .drawer-open .floating-actions {
+    bottom: calc(60vh + 16px);
   }
   
   .fab {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
   }
   
   .fab svg {
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
   }
 }
 
@@ -789,7 +929,7 @@ const getCategoryClass = (category) => {
 @media (max-width: 480px) {
   .app-header {
     height: 50px;
-    padding: 0 8px;
+    padding: 0 10px;
   }
   
   .logo-icon {
@@ -805,63 +945,82 @@ const getCategoryClass = (category) => {
   }
   
   .category-pills {
-    gap: 3px;
+    gap: 4px;
   }
   
   .pill {
-    padding: 5px 6px;
-    font-size: 10px;
+    padding: 5px 8px;
+    font-size: 11px;
   }
   
   .pill-icon {
-    font-size: 10px;
-  }
-  
-  .stats-badge {
-    padding: 3px 6px;
-    font-size: 10px;
+    font-size: 11px;
   }
   
   .app-main {
     padding-top: 50px;
   }
   
+  .map-section {
+    height: calc(100vh - 50px);
+  }
+  
   .sidebar {
-    height: 38vh;
-    max-height: 280px;
+    height: 55vh;
+    max-height: 450px;
+  }
+  
+  .drawer-header {
+    padding: 10px 12px;
+  }
+  
+  .drawer-title {
+    font-size: 14px;
   }
   
   .sidebar-header {
-    padding: 14px 10px 6px;
+    padding: 10px 12px 6px;
   }
   
   .search-input {
-    padding: 6px 28px 6px 32px;
-    font-size: 12px;
-  }
-  
-  .category-stats {
-    margin-top: 6px;
+    padding: 8px 32px 8px 36px;
+    font-size: 13px;
   }
   
   .merchant-list {
-    padding: 6px 10px;
-    gap: 6px;
+    padding: 10px 12px;
+    gap: 8px;
+    max-height: calc(55vh - 140px);
   }
   
   .floating-actions {
-    bottom: calc(38vh + 10px);
-    right: 10px;
+    bottom: 20px;
+    right: 12px;
+  }
+  
+  .drawer-open .floating-actions {
+    bottom: calc(55vh + 12px);
   }
   
   .fab {
-    width: 36px;
-    height: 36px;
+    width: 40px;
+    height: 40px;
   }
   
   .fab svg {
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+/* 桌面端隐藏移动端专属元素 */
+@media (min-width: 769px) {
+  .mobile-overlay {
+    display: none !important;
+  }
+  
+  .drawer-header {
+    display: none !important;
   }
 }
 
@@ -885,32 +1044,36 @@ const getCategoryClass = (category) => {
     padding-top: 44px;
   }
   
+  .mobile-overlay {
+    display: none !important;
+  }
+  
   .sidebar {
     position: relative;
     bottom: auto;
     left: auto;
     right: auto;
-    width: 260px;
+    width: 280px;
     height: 100%;
     max-height: none;
     border-radius: 0;
     border-right: 1px solid var(--glass-border);
     border-top: none;
-    order: 1;
+    transform: none;
   }
   
-  .sidebar::before {
+  .drawer-header {
     display: none;
   }
   
   .map-section {
     flex: 1;
-    order: 2;
+    height: 100%;
   }
   
   .floating-actions {
-    bottom: 12px;
-    right: 12px;
+    bottom: 16px;
+    right: 16px;
   }
 }
 </style>

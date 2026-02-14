@@ -256,8 +256,124 @@ const flyTo = (merchant) => {
   }, duration + 100);
 };
 
+// 显示商家详情弹窗
+const showMerchantInfo = (merchant) => {
+  if (!mapInstance.value || !window.AMap) return;
+  
+  const AMap = window.AMap;
+  const position = [merchant.longitude, merchant.latitude];
+  
+  const content = `
+    <div style="
+      background: rgba(253, 248, 243, 0.98);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(74, 69, 65, 0.15);
+      border: 1px solid rgba(139, 115, 85, 0.15);
+      padding: 20px;
+      min-width: 240px;
+      max-width: 300px;
+      font-family: 'Noto Sans SC', sans-serif;
+    ">
+      <div style="
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: rgba(139, 115, 85, 0.1);
+        cursor: pointer;
+        color: #7D756D;
+        font-size: 18px;
+        transition: all 0.2s;
+      " onclick="this.parentElement.style.display='none'" 
+      onmouseover="this.style.background='#C67B5C'; this.style.color='white'"
+      onmouseout="this.style.background='rgba(139, 115, 85, 0.1)'; this.style.color='#7D756D'">×</div>
+
+      <h3 style="
+        font-family: 'Noto Serif SC', serif;
+        font-size: 18px;
+        font-weight: 600;
+        margin: 0 0 12px 0;
+        color: #4A4541;
+        padding-right: 30px;
+      ">${merchant.name}</h3>
+      
+      <div style="
+        display: inline-block;
+        padding: 4px 10px;
+        background: rgba(198, 123, 92, 0.12);
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+        color: #C67B5C;
+        margin-bottom: 12px;
+      ">${merchant.category}</div>
+      
+      ${merchant.description ? `
+        <p style="
+          margin: 0 0 10px 0;
+          color: #4A4541;
+          font-size: 13px;
+          line-height: 1.6;
+        ">${merchant.description}</p>
+      ` : ''}
+      
+      <p style="
+        margin: 0 0 8px 0;
+        color: #7D756D;
+        font-size: 13px;
+        line-height: 1.5;
+        display: flex;
+        align-items: flex-start;
+        gap: 6px;
+      ">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0; margin-top: 2px; opacity: 0.6;">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+          <circle cx="12" cy="10" r="3"/>
+        </svg>
+        ${merchant.address}
+      </p>
+      
+      ${merchant.opening_hours ? `
+        <p style="
+          margin: 0;
+          color: #9CAF88;
+          font-size: 12px;
+          font-weight: 500;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        ">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="opacity: 0.8;">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+          ${merchant.opening_hours}
+        </p>
+      ` : ''}
+    </div>
+  `;
+
+  if (!infoWindowRef.value) {
+    infoWindowRef.value = new AMap.InfoWindow({
+      isCustom: true,
+      autoMove: true,
+      offset: new AMap.Pixel(0, -35)
+    });
+  }
+
+  infoWindowRef.value.setContent(content);
+  infoWindowRef.value.open(mapInstance.value, position);
+};
+
 defineExpose({
   flyTo,
+  showMerchantInfo,
   fitToAllMarkers: () => {
     if (mapInstance.value && markerInstances.length > 0) {
       mapInstance.value.setFitView(
